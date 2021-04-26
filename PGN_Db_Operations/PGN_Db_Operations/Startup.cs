@@ -42,7 +42,8 @@ namespace PGN_Db_Operations
             Environment.SetEnvironmentVariable("AWS_REGION", Configuration["AWS:Region"]);
             services.AddAWSService<IAmazonDynamoDB>();
             services.AddSingleton<IPostData, PostData>();
-        }
+            services.AddSingleton<IGetProfile, GetProfile>();
+        }  
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

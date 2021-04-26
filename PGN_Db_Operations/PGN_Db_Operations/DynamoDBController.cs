@@ -17,28 +17,34 @@ namespace PGN_Db_Operations
     public class DynamoDBController : ControllerBase
     {
         public readonly IPostData _postData;
-        public DynamoDBController(IPostData postData)
+        public readonly IGetProfile _getUserProfile;
+        public DynamoDBController(IPostData postData, IGetProfile getUserProfile)
         {
             _postData = postData;
+            _getUserProfile = getUserProfile;
         }
         [HttpPost("post")]
         [Consumes("application/json")]
         public async Task<IActionResult> PostToDynamoDB([FromBody]PostModel payload)
         {
-            //if(payload == null)
-            //{
-            //    return new ContentResult
-            //    {
-            //        Content = "Payload is empty",
-            //        StatusCode = (int)HttpStatusCode.BadRequest
-            //    };
-            //}
-            //Console.WriteLine(payload);
+            if (payload == null)
+            {
+                return new ContentResult
+                {
+                    Content = "Payload is empty",
+                    StatusCode = (int)HttpStatusCode.BadRequest
+                };
+            }
             JObject postbody = JObject.Parse(JsonConvert.SerializeObject(payload));
             await _postData.AddPost(postbody);
             Console.WriteLine(payload);
             return new JsonResult("created") { StatusCode = (int)HttpStatusCode.Created };
         }
-
+        [HttpGet("userprofile")]
+        public async Task<IActionResult> GetPostFromDynamoDb([FromQuery] string userId)
+        {
+            var response = await _getUserProfile.GetUserProfile(userId);
+            return Ok(response);
+        }
     }
 }
